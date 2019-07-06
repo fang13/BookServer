@@ -2,3 +2,4 @@
 /out
 /.vscode
 package-lock.json
+.gitignore.bak
