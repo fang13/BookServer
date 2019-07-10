@@ -41,18 +41,6 @@ export class DBUtils{
 	}); 
    }
 
-   //向数据库中插入用户数据
-   public static addUser(user:User){
-    const addSql = 'INSERT INTO user SET ?';
-    ''
-    connection.query(addSql,user,(err,results) => {
-        if (err) {
-            console.log('添加用户失败');
-        }
-
-    })
-   }
-
    //向数据库中插入书籍数据
    public static addBook(){
     var tableName = 'books';
@@ -69,6 +57,41 @@ export class DBUtils{
         }
     })
    }
+
+   //向数据库中添加用户
+   public static addUser(){
+    var tableName = 'user';
+    var key = '(id,pitcture,name,nickName,jobID,phoneNumber,joinTime,state,authority)';
+    var values = '("12345","头像","周","zhou","z5002223","13100001111","2019-3-6","normal","user")';
+    var addSql = `INSERT INTO ${tableName} \n ${key} \n VALUES \n ${values};`;
+    console.log(addSql);
+    connection.query(addSql, (err,results) => {
+        if (err) {
+            console.log('添加书籍失败');
+            console.log(err.message);
+        }else{
+            console.log('添加书籍成功');
+        }
+    })
+   }
+
+   //向数据库中添加图书馆信息
+   public static addLibrary(){
+    var tableName = 'library';
+    var key = '(id,name,owner,location,description)';
+    var values = '("12345","abc图书馆","abc","广东省xx市","这是一个很好的图书馆")';
+    var addSql = `INSERT INTO ${tableName} \n ${key} \n VALUES \n ${values};`;
+    console.log(addSql);
+    connection.query(addSql, (err,results) => {
+        if (err) {
+            console.log('添加书籍失败');
+            console.log(err.message);
+        }else{
+            console.log('添加书籍成功');
+        }
+    })
+   }
+
   
 
     
