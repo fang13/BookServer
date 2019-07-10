@@ -57,14 +57,16 @@ export class DBUtils{
    public static addBook(){
     var tableName = 'books';
     var key = '(id, levelOne, levelTwo, name, ISBN, author, publisher, publishDate, amount, borrowedTimes, label, descption, storeInfo, collectionTimes, isCanBeBorrowed, state, borrowHistory )';
-    var values = '("123", "测试", "插入书籍测试","围城"， "123456", "钱钟书", "出版者", "出版时间"，10, 20, "标签", "描述", "存储信息", 10, "true", "在管", "借阅历史")';
-    var addSql = 'INSERT INTO ${tableName} \n ${key} \n VALUES \n ${values}';
+    var values = '("123", "测试", "插入书籍测试","围城", "123456", "钱钟书", "出版者", "出版时间", 10, 20, "标签", "描述", "存储信息", 10, "true", "在管", "借阅历史")';
+    var addSql = `INSERT INTO ${tableName} \n ${key} \n VALUES \n ${values};`;
     console.log(addSql);
     connection.query(addSql, (err,results) => {
         if (err) {
             console.log('添加书籍失败');
+            console.log(err.message);
+        }else{
+            console.log('添加书籍成功');
         }
-        console.log('添加书籍成功');
     })
    }
   
