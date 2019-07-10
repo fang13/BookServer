@@ -1,27 +1,22 @@
 import * as express from "express";
 import { Util } from "./util/util";
-import { DBUtils } from "./util/dbUtils"
+var routes=require('./routes/index');
 
 Util.init();
+var app = express();
 
-let router = express();
-
-router.use((req, res, next) => {
+app.use((req, res, next) => {
   Util.timeLog();
   next();
 })
 
-router.get('/', function (req, res) {
+app.get('/', function (req, res) {
   res.send('Home Page');
 })
 
+app.use('/',routes);
 
-router.listen(8080, () => {
-  console.log("开启服务");
+app.listen(8080, () => {
+  console.log("开启服务 hello");
 });
 
-//测试用
-router.post('/adddata', (req,res) => {
-  DBUtils.addBook();
-  res.send('添加数据成功');
-})
