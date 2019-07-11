@@ -81,3 +81,11 @@ INSERT INTO library
      VALUES
      ("12345","abc图书馆","abc","广东省xx市","这是一个很好的图书馆");
 ```
+
+## 查询数据
+```sql
+SELECT column_name,column_name
+FROM table_name
+[WHERE Clause]
+[LIMIT N][ OFFSET M]
+```
