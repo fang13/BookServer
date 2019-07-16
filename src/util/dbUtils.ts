@@ -44,8 +44,8 @@ export class DBUtils{
    //向数据库中插入书籍数据
    public static addBook(){
     var tableName = 'books';
-    var key = '(id, levelOne, levelTwo, name, ISBN, author, publisher, publishDate, amount, borrowedTimes, label, descption, storeInfo, collectionTimes, isCanBeBorrowed, state, borrowHistory )';
-    var values = '("123", "测试", "插入书籍测试","围城", "123456", "钱钟书", "出版者", "出版时间", 10, 20, "标签", "描述", "存储信息", 10, "true", "在管", "借阅历史")';
+    var key = '(id, levelOne, levelTwo, name, ISBN, author, publisher, publishDate, amount, borrowedTimes, label, descption, storeInfo, collectionTimes, isCanBeBorrowed, state, borrowHistory, addTime )';
+    var values = '("123", "测试", "插入书籍测试","围城", "123456", "钱钟书", "出版者", "出版时间", 10, 20, "标签", "描述", "存储信息", 10, "true", "在管", "借阅历史", "加入图书馆时间")';
     var addSql = `INSERT INTO ${tableName} \n ${key} \n VALUES \n ${values};`;
     console.log(addSql);
     connection.query(addSql, (err,results) => {
@@ -90,6 +90,36 @@ export class DBUtils{
             console.log('添加书籍成功');
         }
     })
+   }
+
+   //向数据库中查询信息
+   public static searchData(tableName:string[],key:string[]){
+       let SearchtableName:any;
+       let Searchkey:any;
+       if(tableName.length == 1){
+            SearchtableName = tableName[0];
+       }else{
+           SearchtableName = tableName.toString();
+       }
+
+       if(key.length == 1){
+            Searchkey = key[0];
+        }else{
+            Searchkey = key.toString();
+        }
+
+       var searchSql = `SELECT ${Searchkey} FROM ${SearchtableName}`;
+       console.log(searchSql);
+       connection.query(searchSql, (err,results) => {
+        if (err) {
+            console.log('查找失败');
+            console.log(err.message);
+        }else{
+            console.log('查找成功');
+            console.log(results);
+        }
+    })
+    
    }
 
   
