@@ -35,6 +35,19 @@ router.get('/adduser', function(req,res){
   }
 }) 
 
+ //测试用，查询收据
+ router.get('/searchData', function(req,res){
+   let key = ["name"];
+   let table = ["books"];
+  try{
+    let result = DBUtils.searchData(table, key);
+    console.log(result);
+    res.send('查询数据完成');
+  }catch(err){
+    res.send('查询数据失败');
+    res.send(err.message);
+  }
+}) 
      
 
 module.exports = router;
