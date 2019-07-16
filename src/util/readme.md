@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS books(
    isCanBeBorrowed VARCHAR(40) NOT NULL,
    state VARCHAR(40) NOT NULL,
    borrowHistory VARCHAR(40) NOT NULL,
+   addTime  VARCHAR(40) NOT NULL,
    PRIMARY KEY ( id, ISBN, name, author )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
@@ -83,9 +84,8 @@ INSERT INTO library
 ```
 
 ## 查询数据
+示例：从表books中查询id和书名
 ```sql
-SELECT column_name,column_name
-FROM table_name
-[WHERE Clause]
-[LIMIT N][ OFFSET M]
+SELECT id,name
+FROM books
 ```

@@ -7,7 +7,7 @@ var app = express();
 
 app.use((req, res, next) => {
   Util.timeLog();
-  next();
+  next(); 
 })
 
 app.get('/', function (req, res) {

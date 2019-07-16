@@ -1,8 +1,8 @@
 var mysql = require('mysql');
 import { config } from "../config";
 import { connect } from "http2";
-import { User } from "../base/user";
-import { Book } from "../base/book";
+import { User } from "../model/user";
+import { Book } from "../model/book";
 
 let options = {
     host: config.db_host,
