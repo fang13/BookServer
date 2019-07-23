@@ -1,7 +1,9 @@
 import * as express from "express";
 import { Util } from "./util/util";
-var routes=require('./routes/index');
 
+var routes=require('./routes/index');
+var bodyParser = require("body-parser")
+app.use(bodyParser.urlencoded({extended:false}))
 Util.init();
 var app = express();
 

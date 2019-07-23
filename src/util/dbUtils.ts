@@ -3,16 +3,17 @@ import { config } from "../config";
 import { connect } from "http2";
 import { User } from "../model/user";
 import { Book } from "../model/book";
+const coMysql = require('co-mysql');
 
-let options = {
+const pool = mysql.createPool({
     host: config.db_host,
     port: config.db_port,
     user: config.username,
     password: config.password,
     database: config.db_name
-};
+}) 
 
-let connection = mysql.createConnection(options);
+let connection = coMysql.createConnection(pool);
 
 export class DBUtils{
    /**
@@ -120,6 +121,7 @@ export class DBUtils{
         }
     })
     
+   
    }
 
   
@@ -127,3 +129,10 @@ export class DBUtils{
     
 
 }
+
+let query = (sql, callback) => {
+    connection.query(sql, function (err, rows) {
+        callback(err, rows);
+    });
+}
+exports.query = query
