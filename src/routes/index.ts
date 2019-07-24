@@ -190,4 +190,136 @@ router.put('/bookClassification/deleteClassification/:classificationID', async (
     res.end();
 })
 
+//图书列表
+router.get('/book/getBookList', async (req, res) => {
+    try {
+        const data = await connection.query(`SELECT * FROM Books_table;`);
+        res.write(JSON.stringify({
+            userList: [data],
+            total:data.length
+        }))
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.writeHead(500);
+    }
+    res.end();
+})
+
+//查看图书详情
+router.get('/book/:bookID', async (req, res) => {
+    let bookID = req.bookID;
+    try {
+        const data = await connection.query(`SELECT * FROM Books_table WHERE bookID=${bookID};`);
+        res.write(JSON.stringify({
+            userList: [data],
+            total:data.length
+        }))
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.writeHead(500);
+    }
+    res.end();
+})
+
+//图书历史借还记录
+router.get('/book/borrow/:bookID', async (req, res) => {
+    let bookID = req.bookID;
+    try {
+        const data = await connection.query(`SELECT * FROM BorrowHistory_table WHERE bookID=${bookID};`);
+        res.write(JSON.stringify({
+            userList: [data],
+            total:data.length
+        }))
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.writeHead(500);
+    }
+    res.end();
+})
+
+
+
+//用户列表
+router.get('/user/getUserList', async (req, res) => {
+    try {
+        const data = await connection.query(`SELECT * FROM User_table;`);
+        res.write(JSON.stringify({
+            userList: [data],
+            total:data.length
+        }))
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.writeHead(500);
+    }
+    res.end();
+})
+
+//修改用户状态
+router.put('/user/changeState/:userID', async (req, res) => {
+    let userID = req.userID;
+    let state = req.state;
+    try {
+        const data = await connection.query(`UPDATE User_Table SET state='${state}' WHERE userID=${userID};`);
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.writeHead(500);
+    }
+    res.end();
+})
+
+//修改用户权限
+router.put('/user/changePermission/:userID', async (req, res) => {
+    let userID = req.userID;
+    let permission = req.permission;
+    try {
+        const data = await connection.query(`UPDATE User_Table SET authority='${permission}' WHERE userID=${userID};`);
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.writeHead(500);
+    }
+    res.end();
+})
+
+//用户历史借还记录
+router.get('/user/records/:userID', async (req, res) => {
+    let userID = req.userID;
+
+    let permission = req.permission;
+    try {
+        const data = await connection.query(`SELECT * FROM BorrowHistory_table WHERE userID=${userID};`);
+        res.write(JSON.stringify({
+            records: [data],
+            total:data.length
+        }))
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.writeHead(500);
+    }
+    res.end();
+})
+
+//管理员列表
+router.get('/admin/getAdminList', async (req, res) => {
+    try {
+        const data = await connection.query(`SELECT adminName FROM Admin_table;`);
+        res.write(JSON.stringify({
+            records: [data],
+            total: data.length
+        }))
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.writeHead(500);
+    }
+    res.end();
+})
 module.exports = router;
