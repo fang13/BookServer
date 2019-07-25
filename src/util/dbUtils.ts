@@ -8,12 +8,12 @@ const coMysql = require('co-mysql');
 const pool = mysql.createPool({
     host: config.db_host,
     port: config.db_port,
-    user: config.username,
+    user: config.username, 
     password: config.password,
     database: config.db_name
 }) 
-
-let connection = coMysql.createConnection(pool);
+    
+let connection = coMysql(pool);
 
 export class DBUtils{
    /**

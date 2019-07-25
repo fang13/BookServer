@@ -1,5 +1,6 @@
 import { DBUtils } from "../util/dbUtils"
 import { config } from "../config";
+import * as http from "http";
 var express = require('express');
 var router = express.Router();
 
@@ -13,10 +14,10 @@ const pool = mysql.createPool({
   database: config.db_name
 }) 
 
-let connection = coMysql.createConnection(pool);
+let connection = coMysql(pool);
 
 //测试用，添加书籍数据
-router.get('/adddata', function (req, res) {
+router.get('/adddata', function (req, res) { 
     try {
         DBUtils.addBook();
         res.send('添加书籍数据完成');
@@ -322,4 +323,28 @@ router.get('/admin/getAdminList', async (req, res) => {
     }
     res.end();
 })
+
+
+//通过网络查询图书信息，测试
+router.get('/testbookInfo', (req, result) => {
+    let bookID = '';
+    const options = {
+        hostname: 'https://douban.uieee.com/v2/book/isbn/9787570208562',
+        port: 443,
+        path: '/',
+        method: 'GET'
+      }; 
+    http.request('http://douban.uieee.com/v2/book/isbn/9787570208562', (res) => {
+        console.log(`STATUS: ${res.statusCode}`);
+        console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+        res.on('data', (chunk) => {
+            console.log(`BODY: ${chunk}`);
+        });
+        res.on('error', (e) => {
+            console.error(e);
+          });
+    })
+    result.send('end');
+})
+
 module.exports = router;
