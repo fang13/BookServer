@@ -1,6 +1,6 @@
 import { DBUtils } from "../util/dbUtils"
 import { config } from "../config";
-import * as http from "http";
+var request = require('request')
 var express = require('express');
 var router = express.Router();
 
@@ -334,17 +334,14 @@ router.get('/testbookInfo', (req, result) => {
         path: '/',
         method: 'GET'
       }; 
-    http.request('http://douban.uieee.com/v2/book/isbn/9787570208562', (res) => {
-        console.log(`STATUS: ${res.statusCode}`);
-        console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-        res.on('data', (chunk) => {
-            console.log(`BODY: ${chunk}`);
-        });
-        res.on('error', (e) => {
-            console.error(e);
-          });
+    request('http://douban.uieee.com/v2/book/isbn/9787570208562', (error,response,body) => {
+        if (error) {
+            console.log(error);
+        }
+        console.log(JSON.parse(body));
+        result.send('end');
     })
-    result.send('end');
+    
 })
 
 module.exports = router;
