@@ -328,12 +328,7 @@ router.get('/admin/getAdminList', async (req, res) => {
 //通过网络查询图书信息，测试
 router.get('/testbookInfo', (req, result) => {
     let bookID = '';
-    const options = {
-        hostname: 'https://douban.uieee.com/v2/book/isbn/9787570208562',
-        port: 443,
-        path: '/',
-        method: 'GET'
-      }; 
+   
     request('http://douban.uieee.com/v2/book/isbn/9787570208562', (error,response,body) => {
         if (error) {
             console.log(error);
@@ -343,5 +338,14 @@ router.get('/testbookInfo', (req, result) => {
     })
     
 })
+
+
+//小程序端接口
+//搜索
+router.get('/searchBook/:param',async (req, res) => {
+    let param = req.param;
+    
+})
+
 
 module.exports = router;
