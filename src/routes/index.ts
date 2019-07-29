@@ -102,93 +102,114 @@ router.post('/login', async (req, res)=> {
 //查询图书馆列表
 router.get('/lib/getLibList', async (req, res) => {
     try {
-        const data = await connection.query(`SELECT libraryName FROM Library_table `);
-        res.write(JSON.stringify(data));
+        const libraryList = await connection.query(`SELECT libraryName,owner,location,description FROM Library_table `);
+        let totalCount = libraryList.length;
+        if (libraryList.length) {
+            let returnRes = JSON.stringify({
+                    libList: libraryList,
+                    total:totalCount
+            })
+            res.send(returnRes);
+        } else {
+            res.send('没有图书馆数据');
+        }
     } catch (error) {
         console.error(error);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //新增图书馆
 router.post('/lib/addLib', async (req, res) => {
-    var UUID = require('uuid');
-    var ID = UUID.v1();
+   let libraryID =  await connection.query(`SELECT MAX(libraryID) FROM library_table`);
+    let joinTime = new Date().toLocaleString('chinese',{hour12:false});
     try {
-        const data = await connection.query(`INSERT INTO library 
-        (id,name,owner,location,description)
+        const data = await connection.query(`INSERT INTO library_table 
+        (libraryID,libraryName,owner,joinTime,location,description)
         VALUES
-        ("${ID}","${req.body.libName}","${req.body.subUnit}","${req.body.address}","${req.body.description}");`);
+        ("${libraryID+1}","${req.body.libName}","${req.body.subUnit}","${joinTime}""${req.body.address}","${req.body.description}");`);
         res.send(true);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //图书分类列表
 router.get('/bookClassification/getClassification/:parentID', async (req,res)=> {
-    let parentID = req.parentID;
-
-    //一级分类 二级分类调教都是parentID
+    let parentID = req.params.parentID;
+    let data: any;
+    //一级分类 二级分类都是parentID
     try {
-        const data = await connection.query(`SELECT className FROM BookClass_table WHERE parentID="${parentID}"`);
-        res.write(JSON.stringify(data));
+        if (parentID) {
+             data = await connection.query(`SELECT className FROM BookClass_table WHERE parentID=${parentID} AND isPrimaryClass=0 AND issecondaryClass=1;`);
+        } else {
+             data = await connection.query(`SELECT className FROM BookClass_table WHERE parentID is NULL AND isPrimaryClass=1 AND issecondaryClass=0;`);
+        }
+        let resultRes = JSON.stringify({
+            bookClassificationList: data,
+            total:data.length
+        });
+        res.send(resultRes);
     } catch (error) {
-        console.log(error);
-        res.writeHead(500);
+        console.error(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //新增图书分类
 router.post('/bookClassification/addClassification/:parentID', async (req, res) => {
-    let parentID = req.parentID;
+    let parentID = req.params.parentID;
     let className = req.body.classificationName;
+    let libraryID =  await connection.query(`SELECT MAX(classID) FROM Class_Table`);
     try {
         const data = await connection.query(`INSERT INTO Class_Table 
-            (className,parentID)
+            (classID,className,parentID)
             VALUES
-            ("${className}","${parentID}");`);
+            ("${libraryID+1},${className}","${parentID}");`);
         res.send(true);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //修改图书分类
 router.put('/bookClassification/updateClassification/:classificationID', async (req, res) => {
-    let classificationID = req.classificationID;
+    let classificationID = req.params.classificationID;
     let classificationName = req.body.classificationName;
     try {
-        const data = await connection.query(`UPDATE Class_Table SET className='${classificationName}' WHERE parentID=${classificationID};`);
+        const data = await connection.query(`UPDATE bookClass_table SET className='${classificationName}' WHERE parentID=${classificationID};`);
         res.send(true);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //删除图书分类
-router.put('/bookClassification/deleteClassification/:classificationID', async (req, res) => {
-    let parentID = req.classificationID;
+router.get('/bookClassification/deleteClassification/:classificationID', async (req, res) => {
+    let parentID = req.params.classificationID;
+    let bookclass = await connection.query(`SELECT className FROM bookClass_Table WHERE parentID=${parentID};`);
+    let className = bookclass[0].className;
+    let searchData = await connection.query(`SELECT bookName FROM books_table WHERE PrimaryClass='${className}' OR secondaryClass='${className}';`);
+    if (searchData) {
+        res.send(false);
+        res.send('当前分类下有书籍存在,无法删除分类');
+        return;
+    }
     try {
-        const data = await connection.query(`DELETE FROM Class_Table WHERE parentID=${parentID};`);
+        const data = await connection.query(`DELETE FROM bookClass_Table WHERE parentID=${parentID};`);
         res.send(true);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //图书列表
@@ -200,45 +221,44 @@ router.get('/book/getBookList', async (req, res) => {
             total:data.length
         }))
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //查看图书详情
 router.get('/book/:bookID', async (req, res) => {
-    let bookID = req.bookID;
+    let bookID = req.params.bookID;
     try {
         const data = await connection.query(`SELECT * FROM Books_table WHERE bookID=${bookID};`);
-        res.write(JSON.stringify({
-            userList: [data],
-            total:data.length
-        }))
+        let resultRes = JSON.stringify({
+            books: data,
+            total: data.length
+        });
+        res.send(resultRes)
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //图书历史借还记录
 router.get('/book/borrow/:bookID', async (req, res) => {
-    let bookID = req.bookID;
+    let bookID = req.params.bookID;
     try {
         const data = await connection.query(`SELECT * FROM BorrowHistory_table WHERE bookID=${bookID};`);
-        res.write(JSON.stringify({
-            userList: [data],
-            total:data.length
-        }))
+        let resultRes = JSON.stringify({
+            books: data,
+            total: data.length
+        });
+        res.send(resultRes);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 
@@ -334,7 +354,7 @@ router.get('/testbookInfo', (req, result) => {
             console.log(error);
         }
         console.log(JSON.parse(body));
-        result.send('end');
+        result.send(body);
     })
     
 })
