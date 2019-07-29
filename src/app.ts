@@ -11,7 +11,7 @@ app.use((req, res, next) => {
   Util.timeLog();
   next(); 
 })
-
+    
 app.get('/', function (req, res) {
   res.send('Home Page');
 })

@@ -19,7 +19,7 @@ export class Book {
     public borrowedTimes: number;
     public label: string;
     public descption: number;
-    public storeInfo: { [libraryID: string]: number };
+    public storeInfo: string;
     public collectionTimes:number;
     public isCanBeBorrowed:boolean;
     public state:string;
