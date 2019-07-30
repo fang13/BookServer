@@ -69,34 +69,38 @@ router.post('/login', async (req, res)=> {
     let username = req.query.username;
     let password = req.query.password;
     let response: any;
-
-    try {
-    //根据用户名查询
-        const data = await connection.query(`SELECT username, password FROM Admin_table WHERE username='${username}'`);
-    if (!data.length) {
-        // 用户不存在
-        res.write(JSON.stringify({
-            error: 1,
-            msg: '用户名或密码错误'
-        }))
-    } else if (data[0].password !== password) {
-        //密码不正确
-        res.write(JSON.stringify({
-            error: 1,
-            msg: '用户名或密码错误'
-        }))
+    if (username == 'admin' && password == 'admin') {
+        res.send(true);
     } else {
-        //登录成功
-        res.write(JSON.stringify({
-            error: 0,
-            msg: '登录成功'
-          }))
+        res.send(false);
     }
-    } catch (error) {
-        console.error(error);
-        res.writeHead(500);
-    }
-    res.end();
+    // try {
+    // //根据用户名查询
+    //     const data = await connection.query(`SELECT username, password FROM Admin_table WHERE username='${username}'`);
+    // if (!data.length) {
+    //     // 用户不存在
+    //     res.write(JSON.stringify({
+    //         error: 1,
+    //         msg: '用户名或密码错误'
+    //     }))
+    // } else if (data[0].password !== password) {
+    //     //密码不正确
+    //     res.write(JSON.stringify({
+    //         error: 1,
+    //         msg: '用户名或密码错误'
+    //     }))
+    // } else {
+    //     //登录成功
+    //     res.write(JSON.stringify({
+    //         error: 0,
+    //         msg: '登录成功'
+    //       }))
+    // }
+    // } catch (error) {
+    //     console.error(error);
+    //     res.writeHead(500);
+    // }
+
 })
 
 //查询图书馆列表
