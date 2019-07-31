@@ -125,7 +125,13 @@ router.get('/lib/getLibList', async (req, res) => {
 
 //新增图书馆
 router.post('/lib/addLib', async (req, res) => {
-   let libraryID =  await connection.query(`SELECT MAX(libraryID) FROM library_table`);
+    
+    let libraryID = await connection.query(`SELECT MAX(libraryID) FROM library_table`);
+    if (!libraryID) {
+        //如果ID不存在，则说明是第一条记录
+        const baseID = 300;
+        libraryID = 300;
+    }
     let joinTime = new Date().toLocaleString('chinese',{hour12:false});
     try {
         const data = await connection.query(`INSERT INTO library_table 
@@ -167,7 +173,12 @@ router.get('/bookClassification/getClassification/:parentID', async (req,res)=> 
 router.post('/bookClassification/addClassification/:parentID', async (req, res) => {
     let parentID = req.params.parentID;
     let className = req.body.classificationName;
-    let libraryID =  await connection.query(`SELECT MAX(classID) FROM Class_Table`);
+    let libraryID = await connection.query(`SELECT MAX(classID) FROM Class_Table`);
+    if (!libraryID) {
+        //如果ID不存在，则说明是第一条记录
+        const baseID = 500;
+        libraryID = 500;
+    }
     try {
         const data = await connection.query(`INSERT INTO Class_Table 
             (classID,className,parentID)
@@ -218,6 +229,7 @@ router.get('/bookClassification/deleteClassification/:classificationID', async (
 
 //图书列表
 router.get('/book/getBookList', async (req, res) => {
+
     try {
         const data = await connection.query(`SELECT * FROM Books_table;`);
         res.write(JSON.stringify({
@@ -278,9 +290,8 @@ router.get('/user/getUserList', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //修改用户状态
@@ -293,9 +304,8 @@ router.put('/user/changeState/:userID', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //修改用户权限
@@ -308,16 +318,14 @@ router.put('/user/changePermission/:userID', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
+
 })
 
 //用户历史借还记录
 router.get('/user/records/:userID', async (req, res) => {
     let userID = req.userID;
-
-    let permission = req.permission;
     try {
         const data = await connection.query(`SELECT * FROM BorrowHistory_table WHERE userID=${userID};`);
         res.write(JSON.stringify({
@@ -327,9 +335,8 @@ router.get('/user/records/:userID', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
 //管理员列表
@@ -343,11 +350,122 @@ router.get('/admin/getAdminList', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.send(false);
-        res.writeHead(500);
+        res.send('发生错误,错误信息' + error);
     }
-    res.end();
 })
 
+//标签列表
+router.get('/labelList', async (req, res) => {
+    try {
+        const data = await connection.query(`SELECT labelName FROM labels_table;`);
+        res.write(JSON.stringify({
+            records: [data],
+            total:data.length
+        }))
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }    
+})
+
+//给图书添加标签
+router.get('/addBookLabel/:bookID', async (req, res) => {
+    let bookID = req.params.bookID;
+    let addlabel = req.body.addlabel;
+
+    try {
+        const data = await connection.query(`UPDATE books_table SET label=CONCAT(label,${addlabel}) WHERE bookID=${bookID};`);
+        res.write(JSON.stringify({
+            records: [data],
+            total:data.length
+        }))
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }    
+})
+
+//给图书移除标签
+router.get('/addBookLabel/:bookID', async (req, res) => {
+    let bookID = req.params.bookID;
+    let removelabel = req.body.removelabel;
+
+    try {
+        const data = await connection.query(`UPDATE books_table SET label=REPLACE(label,${removelabel},'') WHERE bookID=${bookID};`);
+        res.send(JSON.stringify({
+            records: [data],
+            total:data.length
+        }))
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }    
+})
+
+//新增标签
+router.get('/addLabel/', async (req, res) => {
+    let label = req.body.label;
+    let labelID = await connection.query(`SELECT MAX(labelID) FROM labels_table`);
+    if (!labelID) {
+        //如果ID不存在，则说明是第一条记录
+        labelID = 700;
+    }
+    try {
+        const data = await connection.query(`INSERT INTO labels_table 
+        (labelID,labelName)
+        VALUES
+        (${labelID + 1},${label});`);
+        
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }    
+})
+
+//删除标签
+router.get('/deleteLabel/:labelID', async (req, res) => {
+    let labelID = req.params.labelID;
+    if (!labelID) {
+        //如果ID不存在，则说明是第一条记录
+        res.send(false)
+        res.send('标签不存在');
+    }
+    try {
+        const data = await connection.query(`DELETE FROM labels_table WHERE labelID=${labelID};`);
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }    
+})
+
+//标签下所有图书列表
+router.get('/bookLabelList/:labelID', async (req, res) => {
+    let labelID = req.params.labelID;
+    if (!labelID) {
+        //如果ID不存在，则说明是第一条记录
+        res.send(false)
+        res.send('标签不存在');
+    }
+    try {
+        const data = await connection.query(`SELECT * FROM books_table WHERE label LIKE CONCAT('%',(SELECT labelName FROM labels_table WHERE labelID=${labelID}),'%');`);
+        res.send(JSON.stringify({
+            records: [data],
+            total:data.length
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }    
+})
 
 //通过网络查询图书信息，测试
 router.get('/testbookInfo', (req, result) => {
@@ -362,6 +480,7 @@ router.get('/testbookInfo', (req, result) => {
     })
     
 })
+
 
 
 //小程序端接口
