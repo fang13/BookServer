@@ -358,7 +358,7 @@ router.get('/admin/getAdminList', async (req, res) => {
 router.get('/labelList', async (req, res) => {
     try {
         const data = await connection.query(`SELECT labelName FROM labels_table;`);
-        res.write(JSON.stringify({
+        res.send(JSON.stringify({
             records: [data],
             total:data.length
         }))
@@ -484,11 +484,17 @@ router.get('/testbookInfo', (req, result) => {
 
 
 //小程序端接口
-//搜索
-router.get('/searchBook/:param',async (req, res) => {
-    let param = req.param;
+
+//首页banner图
+router.post('/getBanner',async (req, res) => {
+    
     
 })
 
+//搜索 (书名，ISBN,作者)
+router.get('/getBookList',async (req, res) => {
+    
+    
+})
 
 module.exports = router;
