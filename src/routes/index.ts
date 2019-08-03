@@ -447,8 +447,57 @@ router.post('/getBanner',async (req, res) => {
 
 //搜索 (书名，ISBN,作者)
 router.get('/getBookList',async (req, res) => {
+    let temp = req.body.params;
+    let params = JSON.parse(temp);
+    let queryStr: string;
+    if (params.bookName) {
+        // Select * From books_table Where bookID In (Select MIN(bookID) From books_table Group By bookName)
+        queryStr = `Select * From books_table Where bookID In (Select MIN(bookID) From (Select * From books_table Where bookName like %${params.bookName}%)) Group By bookName;`;
+    } else if (params.author) {
+        queryStr = `Select * From books_table Where bookID In (Select MIN(bookID) From (Select * From books_table Where author like %${params.author}%)) Group By bookName;`;
+    } else if (params.ISBN) {
+        queryStr = `Select * From books_table Where bookID In (Select MIN(bookID) From (Select * From books_table Where ISBN10 like %${params.ISBN}%)) Group By bookName;`;
+    } else {
+        return;
+    }
+
+    try {
+        const data = await connection.query(queryStr);
+        res.send(JSON.stringify({
+            records: [data],
+            total:data.length
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
     
-    
+})
+
+
+//图书分类列表
+router.get('/getClassificationList/:parentId', async (req, res) => {
+    let parentId = req.params.parentId;
+    let className = await connection.query(`SELECT className FROM bookClass_table WHERE parentId IS NULL`);
+    let queryStr: string;
+    if (!parentId) {
+        //如果ID不存在，则说明是一级分类
+        queryStr = `SELECT className FROM books_table WHERE PrimaryClass LIKE %${}%;`
+    }
+    try {
+        const data = await connection.query(`SELECT * FROM books_table WHERE label LIKE CONCAT('%',(SELECT labelName FROM labels_table WHERE labelID=${labelID}),'%');`);
+        res.send(JSON.stringify({
+            records: [data],
+            total:data.length
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }    
 })
 
 module.exports = router;
