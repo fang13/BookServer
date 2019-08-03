@@ -16,52 +16,6 @@ const pool = mysql.createPool({
 
 let connection = coMysql(pool);
 
-//测试用，添加书籍数据
-router.get('/adddata', function (req, res) { 
-    try {
-        DBUtils.addBook();
-        res.send('添加书籍数据完成');
-    } catch (err) {
-        res.send('添加书籍数据失败');
-        res.send(err.message);
-    }
-})
-
-//测试用，添加用户数据
-router.get('/adduser', function (req, res) {
-    try {
-        DBUtils.addUser();
-        res.send('添加用户数据完成');
-    } catch (err) {
-        res.send('添加用户数据失败');
-        res.send(err.message);
-    }
-})
-
-//测试用，添加图书馆数据
-router.get('/addlibrary', function (req, res) {
-    try {
-        DBUtils.addLibrary();
-        res.send('添加图书馆数据完成');
-    } catch (err) {
-        res.send('添加图书馆数据失败');
-        res.send(err.message);
-    }
-})
-
-//测试用，查询收据
-router.get('/searchData', function (req, res) {
-    let key = ["name"];
-    let table = ["books"];
-    try {
-        let result = DBUtils.searchData(table, key);
-        console.log(result);
-        res.send('查询数据完成');
-    } catch (err) {
-        res.send('查询数据失败');
-        res.send(err.message);
-    }
-})
 
 //后台接口
 //登录接口
