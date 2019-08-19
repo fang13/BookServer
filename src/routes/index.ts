@@ -487,7 +487,7 @@ router.get('/getClassificationList/:parentId', async (req, res) => {
         queryStr = `SELECT className FROM books_table WHERE PrimaryClass LIKE %${}%;`
     }
     try {
-        const data = await connection.query(`SELECT * FROM books_table WHERE label LIKE CONCAT('%',(SELECT labelName FROM labels_table WHERE labelID=${labelID}),'%');`);
+        const data = await connection.query(`SELECT * FROM books_table WHERE label LIKE CONCAT('%',(SELECT labelName FROM labels_table WHERE labelID=${parentId}),'%');`);
         res.send(JSON.stringify({
             records: [data],
             total:data.length
@@ -499,5 +499,128 @@ router.get('/getClassificationList/:parentId', async (req, res) => {
         res.send('发生错误,错误信息' + error);
     }    
 })
+
+//热门收藏
+router.get('/book/hotCollection', async (req, res) => {
+    try {
+        const data = await connection.query(`SELECT bookName FROM labels_table WHERE label LIKE %热门收藏%);`);
+        res.send(JSON.stringify({
+            records: [data],
+            total:data.length
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }    
+})
+
+//最新上架
+router.get('/book/newArrival', async (req, res) => {
+    
+})
+
+//图书详情
+router.get('/book/bookDetail/:userId', async (req, res) => {
+    let bookID = req.body.bookID
+    try {
+        const data = await connection.query(`SELECT * FROM books_table WHERE bookID=${bookID};`);
+        res.send(JSON.stringify({
+            bookDetailList: [data]
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+})
+
+//我的收藏
+router.get('/user/myCollection/:userId', async (req, res) => {
+    let userID = req.params.userID
+    try {
+        const data = await connection.query(`SELECT * FROM collection_table WHERE userID=${userID};`);
+        res.send(JSON.stringify({
+            myCollectionList: [data]
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+})
+//收藏/取消收藏
+router.get('/book/changeColectionState/:userId', async (req, res) => {
+    let userID = req.params.userID
+    try {
+        const data = await connection.query(`SELECT * FROM collection_table WHERE userID=${userID};`);
+        res.send(JSON.stringify({
+            myCollectionList: [data]
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+})
+
+//借阅中
+
+//已归还
+
+//现有图书馆列表
+
+//还原图书位置
+
+//保存用户信息(注册)
+router.post('/user/save', (req, res) => {
+    let userParams = req.body.userParams;
+    try {
+        let userID = await connection.query(`SELECT MAX(userId) FROM user_table`);
+        if (!userID) {
+            userID = 200;
+        }
+        const data = await connection.query(`INSERT INTO user_table 
+        (userID,profilePicture,userName,nickName,jobID,phoneNumber,joinTime,state,authority)
+        VALUES
+        (${userID+1},"头像","周","zhou","z5002223","13100001111","2019-3-6 20:50:20","normal","user");`);
+        res.send(JSON.stringify({
+            userInfo: [data],
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+    
+})
+
+//异常书籍列表
+
+//点击头像获取用户信息
+router.get('/user/:userId', (req, res) => {
+    let userId = req.params.userId;
+    try {
+      
+        const data = await connection.query(`SELECT * FROM user_table WHERE userId=${userId};`);
+        res.send(JSON.stringify({
+            userInfo: [data],
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+    
+})
+
+
+
 
 module.exports = router;
