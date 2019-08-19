@@ -484,7 +484,7 @@ router.get('/getClassificationList/:parentId', async (req, res) => {
     let queryStr: string;
     if (!parentId) {
         //如果ID不存在，则说明是一级分类
-        queryStr = `SELECT className FROM books_table WHERE PrimaryClass LIKE %${}%;`
+        queryStr = `SELECT className FROM books_table WHERE PrimaryClass LIKE %${className}%;`
     }
     try {
         const data = await connection.query(`SELECT * FROM books_table WHERE label LIKE CONCAT('%',(SELECT labelName FROM labels_table WHERE labelID=${parentId}),'%');`);
@@ -577,7 +577,7 @@ router.get('/book/changeColectionState/:userId', async (req, res) => {
 //还原图书位置
 
 //保存用户信息(注册)
-router.post('/user/save', (req, res) => {
+router.post('/user/save',async (req, res) => {
     let userParams = req.body.userParams;
     try {
         let userID = await connection.query(`SELECT MAX(userId) FROM user_table`);
@@ -603,7 +603,7 @@ router.post('/user/save', (req, res) => {
 //异常书籍列表
 
 //点击头像获取用户信息
-router.get('/user/:userId', (req, res) => {
+router.get('/user/:userId',async (req, res) => {
     let userId = req.params.userId;
     try {
       
