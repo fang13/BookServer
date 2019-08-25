@@ -569,12 +569,67 @@ router.get('/book/changeColectionState/:userId', async (req, res) => {
 })
 
 //借阅中
+router.get('/user/borrowing/:userId', async (req, res) => {
+    let userID = req.params.userID
+    try {
+        const data = await connection.query(`SELECT * FROM borrowHistory_table WHERE userID=${userID} AND returnTime IS NULL;`);
+        res.send(JSON.stringify({
+            borrowingList: [data]
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+})
 
 //已归还
+router.get('/user/returned/:userId', async (req, res) => {
+    let userID = req.params.userID
+    try {
+        const data = await connection.query(`SELECT * FROM borrowHistory_table WHERE userID=${userID} AND returnTime IS NOT NULL;`);
+        res.send(JSON.stringify({
+            returnedList: [data]
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+})
 
 //现有图书馆列表
+router.get('/lib/getLibList', async (req, res) => {
+    try {
+        const data = await connection.query(`SELECT * FROM library_table;`);
+        res.send(JSON.stringify({
+            libList: [data]
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+})
 
 //还原图书位置
+router.get('/book/reSet/:bookId', async (req, res) => {
+    let userID = req.params.userID;
+    try {
+        const data = await connection.query(`UPDATE books_table SET currentLibrary=homeLibrary;`);
+        res.send(JSON.stringify({
+            abnormalList: [data]
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+})
 
 //保存用户信息(注册)
 router.post('/user/save',async (req, res) => {
@@ -601,6 +656,19 @@ router.post('/user/save',async (req, res) => {
 })
 
 //异常书籍列表
+router.get('/book/getAbnormalList', async (req, res) => {
+    try {
+        const data = await connection.query(`SELECT * FROM books_table WHERE homeLibrary!=currentLibrary;`);
+        res.send(JSON.stringify({
+            abnormalList: [data]
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
+})
 
 //点击头像获取用户信息
 router.get('/user/:userId',async (req, res) => {
