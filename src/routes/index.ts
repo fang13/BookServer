@@ -421,6 +421,38 @@ router.get('/bookLabelList/:labelID', async (req, res) => {
     }    
 })
 
+// 上架图书
+router.get('/onbook/:bookID',async (req, res) => {
+    let bookID = req.params.bookID;
+    try {
+      
+        const data = await connection.query(`insert into books_table select * from stashBooks_table where bookID=${bookID};
+        delete from stashBooks_table where bookID=${bookID};`);
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    } 
+})
+// 下架图书
+router.get('/offbook/:bookID',async (req, res) => {
+    let bookID = req.params.bookID;
+    try {
+      
+        const data = await connection.query(`insert into stashBooks_table select * from books_table where bookID=${bookID};
+        delete from books_table where bookID=${bookID};`);
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    } 
+})
+// 批量上架
+
+// 下架图书
+
 //通过网络查询图书信息，测试
 router.get('/testbookInfo', (req, result) => {
     let bookID = '';
@@ -517,8 +549,22 @@ router.get('/book/hotCollection', async (req, res) => {
 })
 
 //最新上架
-router.get('/book/newArrival', async (req, res) => {
-    
+router.get('/book/newArrival/:n', async (req, res) => {
+    let n = req.body.n;
+    if (n == undefined) {
+        n = 10;
+    }
+    try {
+        const data = await connection.query(`select * from books_table order by bookID desc limit ${n};`);
+        res.send(JSON.stringify({
+            newArrivalList: [data]
+        }))
+        res.send(true);
+    } catch (error) {
+        console.log(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }  
 })
 
 //图书详情
