@@ -100,6 +100,21 @@ router.post('/lib/addLib', async (req, res) => {
     }
 })
 
+// 下载图书馆二维码
+router.get('/getARCode/:libraryID', async (req,res)=> {
+    let libraryID = req.params.libraryID;
+    let data: any;
+    try {
+        data = await connection.query(`SELECT * FROM library_table WHERE libraryID=${libraryID};`);
+        let resultRes = JSON.stringify(data);
+        res.send(resultRes);
+    } catch (error) {
+        console.error(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }
+})
+
 //图书分类列表
 router.get('/bookClassification/getClassification/:parentID', async (req,res)=> {
     let parentID = req.params.parentID;
@@ -190,6 +205,19 @@ router.get('/book/getBookList', async (req, res) => {
             userList: [data],
             total:data.length
         }))
+    } catch (error) {
+        console.error(error);
+        res.send(false);
+        res.send('发生错误,错误信息' + error);
+    }
+})
+
+//下载单个二维码
+router.get('/book/getBookARCode/:bookID', async (req, res) => {
+    let bookID = req.params.bookID;
+    try {
+        const data = await connection.query(`SELECT * FROM Books_table WHERE bookID=${bookID};`);
+        res.send(JSON.stringify(data));
     } catch (error) {
         console.error(error);
         res.send(false);
