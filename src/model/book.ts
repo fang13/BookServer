@@ -18,8 +18,7 @@ export class Book {
     public amount: number;
     public borrowedTimes: number;
     public label: string;
-    public desc: number;
-    public storeInfo: { [libraryID: string]: number };
+    public descption: number;
     public collectionTimes:number;
     public isCanBeBorrowed:boolean;
     public state:string;
@@ -38,7 +37,7 @@ export class Book {
         this.amount = amount;
         this.borrowedTimes = borrowedTImes;
         this.label = label;
-        this.desc = desc;
+        this.descption = desc;
         this.collectionTimes = collectionTimes;
         this.isCanBeBorrowed = isCanbeBorrowed;
         this.state = state;

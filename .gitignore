@@ -3,3 +3,6 @@
 /.vscode
 package-lock.json
 .gitignore.bak
+src/util/tempCodeRunnerFile.js
+.vscode/launch.json
+.gitignore
